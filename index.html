@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Video Tracker</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    background:#f2f2f2;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+header{
+    background:#0b57d0;
+    color:white;
+    text-align:center;
+    padding:20px;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.container{
+    width:90%;
+    margin:auto;
+    margin-top:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+video{
+    width:100%;
+    border-radius:10px;
+    background:black;
+}
+
+button{
+    padding:10px 20px;
+    margin:10px 5px;
+    border:none;
+    background:#0b57d0;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#003ea6;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:8px;
+    text-align:center;
+}
+
+th{
+    background:#0b57d0;
+    color:white;
+}
+
+.status{
+    padding:10px;
+    background:#eaf3ff;
+    border-left:5px solid #0b57d0;
+    margin-top:10px;
+}
+
+footer{
+    text-align:center;
+    color:#666;
+    margin:30px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+AI Video Tracker
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Upload Video</h2>
+
+<input type="file" id="videoUpload" accept="video/*">
+
+<br><br>
+
+<video id="video" controls></video>
+
+<br>
+
+<button onclick="playVideo()">Play</button>
+
+<button onclick="pauseVideo()">Pause</button>
+
+<div class="status" id="status">
+
+Status : Waiting for video...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Position-Time Graph</h2>
+
+<canvas id="graph"></canvas>
+
+</div>
+
+<div class="card">
+
+<h2>Tracking Data</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Time (s)</th>
+
+<th>X Position</th>
+
+<th>Y Position</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableData">
+
+</tbody>
+
+</table>
+
+</div>
+
+<footer>
+
+Individual Self Study Project
+
+</footer>
+
+<script>
+
+const video=document.getElementById("video");
+
+const upload=document.getElementById("videoUpload");
+
+const status=document.getElementById("status");
+
+upload.onchange=function(){
+
+const file=this.files[0];
+
+if(file){
+
+video.src=URL.createObjectURL(file);
+
+status.innerHTML="Video Loaded Successfully";
+
+}
+
+};
+
+function playVideo(){
+    video.play();
+    status.innerHTML="Status : Playing video...";
+}
+
+function pauseVideo(){
+    video.pause();
+    status.innerHTML="Status : Video paused.";
+}
+
+// Dữ liệu mẫu (mô phỏng chuyển động con lắc)
+const timeData=[0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0];
+const positionData=[0,18,35,48,55,50,36,18,0,-18,-35];
+
+const ctx=document.getElementById("graph").getContext("2d");
+
+new Chart(ctx,{
+    type:"line",
+    data:{
+        labels:timeData,
+        datasets:[{
+            label:"Position",
+            data:positionData,
+            borderWidth:3,
+            tension:0.35,
+            fill:false
+        }]
+    },
+    options:{
+        responsive:true,
+        plugins:{
+            legend:{
+                display:true
+            }
+        },
+        scales:{
+            x:{
+                title:{
+                    display:true,
+                    text:"Time (s)"
+                }
+            },
+            y:{
+                title:{
+                    display:true,
+                    text:"Position"
+                }
+            }
+        }
+    }
+});
+
+const table=document.getElementById("tableData");
+
+for(let i=0;i<timeData.length;i++){
+
+    const row=document.createElement("tr");
+
+    row.innerHTML=`
+        <td>${timeData[i]}</td>
+        <td>${positionData[i]}</td>
+        <td>${100-positionData[i]}</td>
+    `;
+
+    table.appendChild(row);
+
+}
+
+</script>
+
+</body>
+</html>
